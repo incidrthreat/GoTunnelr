@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/incidrthreat/tunnelr/config"
-	"github.com/incidrthreat/tunnelr/internal/webapp"
+	"github.com/incidrthreat/GoTunnelr/config"
+	"github.com/incidrthreat/GoTunnelr/internal/webapp"
 )
 
 func main() {
