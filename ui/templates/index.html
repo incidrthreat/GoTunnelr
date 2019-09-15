@@ -1,0 +1,13 @@
+{{define "page-title"}}Home{{end}}
+{{ define "page-body" }}
+<a href="/createtunnel">Create tunnel here</a>
+{{ if . }}
+    <div>
+        <p class="lead">{{ . }}</p>
+    </div>
+{{ else }}
+    <div>
+        <p class="lead">Nothing to see here</p>
+    </div>
+{{ end }}
+{{ end }}

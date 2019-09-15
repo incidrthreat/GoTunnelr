@@ -1,0 +1,15 @@
+{{define "base"}}
+<!doctype html>
+    <html lang="en">
+    <head>
+        <title>{{template "page-title" .}} - Tunnelr</title>
+    </head>
+    <body>
+        <h1>This is the BASE PAGE</h1>
+            <!-- Start of Body -->
+            {{template "page-body" . }}
+            <!-- End of Body -->
+        {{ template "footer" }}
+    </body>
+</html>
+{{end}}
