@@ -8,11 +8,10 @@ import (
 
 // Routes ...
 func (app *App) Routes() *mux.Router {
-	r := mux.NewRouter() //.StrictSlash(true)
+	r := mux.NewRouter().StrictSlash(true)
 
-	r.HandleFunc("/", app.Index).Methods("GET", "POST")
+	r.HandleFunc("/", app.Index).Methods("GET")
 	r.HandleFunc("/tunnel/ssh", app.GetSSHTunnel).Methods("GET")
-	r.HandleFunc("/tunnel/createssh", app.CreateSSHTunnel).Methods("POST")
 
 	// static folder linking
 	fs := http.FileServer(http.Dir(app.StaticDir))
