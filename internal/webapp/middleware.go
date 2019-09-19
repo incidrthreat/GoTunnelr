@@ -8,7 +8,9 @@ import (
 
 // HTMLData passing data to and from html
 type HTMLData struct {
-	Data string
+	Form   interface{}
+	Data   string
+	Syntax string
 }
 
 // RenderHTML handles data
