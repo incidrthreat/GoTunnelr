@@ -1,3 +1,17 @@
+function init() {
+    var radios = document.querySelectorAll('[name="tuntype"]'); 
+
+    for (var i = 0; i < radios.length; i++) {
+        radios[i].onclick = function() {  // function runs when radio button is clicked
+            if (this.value == "dynamic") {  // turn off input fields that make no sense
+                // parent selected to get the containing <div> element
+                document.querySelector('input[name="remotehostip"]').parentElement.setAttribute('hidden', true);  
+                document.querySelector('input[name="remotehostport').parentElement.setAttribute('hidden', true);
+            }
+        }
+    }
+}
+
 function getInputs() {
 
     var sshuser = document.querySelector('input[name="sshuser"]');
@@ -17,25 +31,13 @@ function getInputs() {
 
     // dynamic tunnel syntax
     if (tuntype == "dynamic") {
-        if (sshserverport.value == "") {
-            var resultsString = `ssh -p 22 -NfD ${localport.value} ${sshuser.value}@${sshserverip.value}`;
-        } else {
-            var resultsString = `ssh -p ${sshserverport.value} -NfD ${localport.value} ${sshuser.value}@${sshserverip.value}`;
-        }
+        var resultsString = `ssh -p ${sshserverport.value} -NfD ${localport.value} ${sshuser.value}@${sshserverip.value}`;
     // remote tunnel syntax
     } else if (tuntype == "remote") {
-        if (sshserverport.value == "") {
-            var resultsString = `ssh -p 22 -NfR ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
-        } else {
-            var resultsString = `ssh -p ${sshserverport.value} -NfR ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
-        }
+        var resultsString = `ssh -p ${sshserverport.value} -NfR ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
     // local tunnel syntax
     } else if (tuntype == "local") {
-        if (sshserverport.value == "") {
-            var resultsString = `ssh -p 22 -NfL ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
-        } else {
-            var resultsString = `ssh -p ${sshserverport.value} -NfL ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
-        }
+        var resultsString = `ssh -p ${sshserverport.value} -NfL ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
     }
     var preArea = document.createElement("pre");
     preArea.innerHTML = resultsString;
