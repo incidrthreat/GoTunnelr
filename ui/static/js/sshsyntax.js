@@ -1,16 +1,13 @@
-function myonload() {
-    }
-
 function getInputs() {
 
     var sshuser = document.querySelector('input[name="sshuser"]');
-    var sshserverip = document.querySelector('input[name="sshserverip"]');
-    var sshserverport = document.querySelector('input[name="sshserverport"]');
-    var remotehostip = document.querySelector('input[name="remotehostip"]');
-    var localport = document.querySelector('input[name="localport');
-    var remotehostport = document.querySelector('input[name="remotehostport');
-    var radios = document.querySelectorAll('[name="tuntype"]');
-    var resultsTag = document.getElementById("ssh-results");
+    sshserverip = document.querySelector('input[name="sshserverip"]'),
+    sshserverport = document.querySelector('input[name="sshserverport"]'),
+    remotehostip = document.querySelector('input[name="remotehostip"]'),
+    localport = document.querySelector('input[name="localport'),
+    remotehostport = document.querySelector('input[name="remotehostport'),
+    radios = document.querySelectorAll('[name="tuntype"]'),
+    resultsTag = document.getElementById("ssh-results");
 
     for (var i = 0; i < radios.length; i++) {
         if (radios[i].checked) {
