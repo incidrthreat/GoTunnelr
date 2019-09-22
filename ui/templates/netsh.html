@@ -1,22 +1,24 @@
 {{ define "page-title" }} Netsh {{ end }}
 {{ define "page-body" }}
 <div>
-    <label>Local IP:</label>
-    <input id="local-ip" type="text" name="localip" default="0.0.0.0">
-</div>
-<div>
-    <label>Local Port:</label>
-    <input id="local-port" type="text" name="localport">
-</div>
-<div>
-    <label>Remote Host IP:</label>
-    <input id="remote-host" type="text" name="remotehostip">
-</div>
-<div>
-    <label>Remote Host Port:</label>
-    <input id="remote-host-port" type="text" name="remotehostport">
-</div>
-<div>
-    <input type="submit" onclick="getNetshInputs()" value="Create syntax">
+    <div>
+        <label>Local Host IP:</label>
+        <input id="local-ip" type="text" name="localip" value="0.0.0.0">
+    </div>
+    <div>
+        <label>Local Host Port:</label>
+        <input id="local-port" type="text" name="localport">
+    </div>
+    <div>
+        <label>Remote Host IP:</label>
+        <input id="remote-host" type="text" name="remotehostip">
+    </div>
+    <div>
+        <label>Remote Host Port:</label>
+        <input id="remote-host-port" type="text" name="remotehostport">
+    </div>
+    <div>
+        <input type="submit" onclick="getNetshInputs()" value="Create syntax">
+    </div>
 </div>
 {{ end }}
