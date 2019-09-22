@@ -12,9 +12,10 @@ function init() {
     }
 }
 
-function getInputs() {
 
-    var sshuser = document.querySelector('input[name="sshuser"]');
+function getSSHInputs() {
+
+    var sshuser = document.querySelector('input[name="sshuser"]'),
     sshserverip = document.querySelector('input[name="sshserverip"]'),
     sshserverport = document.querySelector('input[name="sshserverport"]'),
     remotehostip = document.querySelector('input[name="remotehostip"]'),
@@ -39,6 +40,20 @@ function getInputs() {
     } else if (tuntype == "local") {
         var resultsString = `ssh -p ${sshserverport.value} -NfL ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
     }
+    var preArea = document.createElement("pre");
+    preArea.innerHTML = resultsString;
+    resultsTag.innerHTML = preArea.innerHTML;
+}
+
+function getNetshInputs() {
+
+    var localip = document.querySelector('input[name="localip'),
+    localport = document.querySelector('input[name="localport'),
+    remotehostip = document.querySelector('input[name="remotehostip'),
+    remotehostport = document.querySelector('input[name="remotehostport'),
+    resultsTag = document.getElementById("netsh-results");
+
+    var resultsString = `netsh interface portproxy add v4tov4 listenaddress=${localip.value} listenport=${localport.value} connectaddress=${remotehostip.value} connectport=${remotehostport.value}`;
     var preArea = document.createElement("pre");
     preArea.innerHTML = resultsString;
     resultsTag.innerHTML = preArea.innerHTML;
