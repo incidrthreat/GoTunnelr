@@ -1,0 +1,24 @@
+{{ define "page-title" }} Netsh {{ end }}
+{{ define "page-body" }}
+<div>
+    <label>Local IP:</label>
+    <input type="text" name="localip" default="0.0.0.0">
+</div>
+<div>
+    <label>Local Port:</label>
+    <input type="text" name="localport">
+</div>
+<div>
+    <label>Remote Host IP:</label>
+    <input type="text" name="remotehostip">
+</div>
+<div>
+    <label>Remote Host Port:</label>
+    <input type="text" name="remotehostport">
+</div>
+<div>
+    <input type="submit" onclick="getNetshInputs()" value="Create syntax">
+</div>
+<div class="container" id="netsh-results"></div>
+<script src="/static/js/syntax.js"></script>
+{{ end }}
