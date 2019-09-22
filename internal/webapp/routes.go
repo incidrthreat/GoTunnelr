@@ -12,6 +12,7 @@ func (app *App) Routes() *mux.Router {
 
 	r.HandleFunc("/", app.Index).Methods("GET")
 	r.HandleFunc("/tunnel/ssh", app.GetSSHTunnel).Methods("GET")
+	r.HandleFunc("/tunnel/netsh", app.GetNetshTunnel).Methods("GET")
 
 	// static folder linking
 	fs := http.FileServer(http.Dir(app.StaticDir))
