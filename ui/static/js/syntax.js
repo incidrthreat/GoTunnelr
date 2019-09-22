@@ -18,7 +18,6 @@ function init() {
 
 
 function getSSHInputs() {
-    
     var radios = document.getElementsByClassName('tuntype');
 
     for (var i = 0; i < radios.length; i++) {
@@ -27,13 +26,13 @@ function getSSHInputs() {
         }
     }
     
-    var sshuser = document.getElementById("ssh-user").value;
-    var resultsTag = document.getElementById("tunnel-results");
-    var localport = document.getElementById("local-port").value;
-    var sshserverip = document.getElementById("ssh-server").value;
-    var remotehostip = document.getElementById("remote-host").value;
-    var sshserverport = document.getElementById("ssh-server-port").value;
-    var remotehostport = document.getElementById("remote-host-port").value;
+    var sshuser = document.getElementById("ssh-user").value,
+    resultsTag = document.getElementById("tunnel-results"),
+    localport = document.getElementById("local-port").value,
+    sshserverip = document.getElementById("ssh-server").value,
+    remotehostip = document.getElementById("remote-host").value,
+    sshserverport = document.getElementById("ssh-server-port").value,
+    remotehostport = document.getElementById("remote-host-port").value;
 
     // dynamic tunnel syntax
     if (tuntype == "dynamic") {
@@ -62,14 +61,27 @@ function getSSHInputs() {
 
 function getNetshInputs() {
 
-    var localip = document.querySelector('input[name="localip'),
-    localport = document.querySelector('input[name="localport'),
-    remotehostip = document.querySelector('input[name="remotehostip'),
-    remotehostport = document.querySelector('input[name="remotehostport'),
-    resultsTag = document.getElementById("netsh-results");
+    var localip = document.getElementById("local-ip").value,
+    localport = document.getElementById("local-port").value,
+    remotehostip = document.getElementById("remote-host").value,
+    remotehostport = document.getElementById("remote-host-port").value,
+    resultsTag = document.getElementById("tunnel-results");
 
-    var resultsString = `netsh interface portproxy add v4tov4 listenaddress=${localip.value} listenport=${localport.value} connectaddress=${remotehostip.value} connectport=${remotehostport.value}`;
-    var preArea = document.createElement("pre");
-    preArea.innerHTML = resultsString;
-    resultsTag.innerHTML = preArea.innerHTML;
+    var resultsString = `netsh interface portproxy add v4tov4 listenaddress=${localip} listenport=${localport} connectaddress=${remotehostip} connectport=${remotehostport}`;
+    
+    var para = document.createElement("p");
+    var node = document.createTextNode(resultsString);
+    para.appendChild(node);
+
+    var resultsElement = document.getElementById("generated-results");
+
+    if (resultsElement) {
+        resultsElement.innerHTML = ''; 
+        resultsElement.appendChild(para);
+    } else {
+        resultsElement = document.createElement("pre");
+        resultsElement.setAttribute("id", "generated-results");
+        resultsElement.appendChild(para);
+        resultsTag.appendChild(resultsElement);
+    }
 }
