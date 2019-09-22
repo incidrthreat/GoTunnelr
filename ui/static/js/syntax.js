@@ -1,12 +1,16 @@
 function init() {
-    var radios = document.querySelectorAll('[name="tuntype"]'); 
+    var radios = document.getElementsByClassName('tuntype');
 
     for (var i = 0; i < radios.length; i++) {
         radios[i].onclick = function() {  // function runs when radio button is clicked
             if (this.value == "dynamic") {  // turn off input fields that make no sense
                 // parent selected to get the containing <div> element
-                document.querySelector('input[name="remotehostip"]').parentElement.setAttribute('hidden', true);  
-                document.querySelector('input[name="remotehostport').parentElement.setAttribute('hidden', true);
+                document.getElementById("remote-host-container").setAttribute('hidden', true);
+                document.getElementById("remote-host-port-container").setAttribute('hidden', true);
+            }
+            else if (this.value == "local" || this.value == "remote") {
+                document.getElementById("remote-host-container").removeAttribute('hidden');
+                document.getElementById("remote-host-port-container").removeAttribute('hidden');
             }
         }
     }
@@ -14,35 +18,46 @@ function init() {
 
 
 function getSSHInputs() {
-
-    var sshuser = document.querySelector('input[name="sshuser"]'),
-    sshserverip = document.querySelector('input[name="sshserverip"]'),
-    sshserverport = document.querySelector('input[name="sshserverport"]'),
-    remotehostip = document.querySelector('input[name="remotehostip"]'),
-    localport = document.querySelector('input[name="localport'),
-    remotehostport = document.querySelector('input[name="remotehostport'),
-    radios = document.querySelectorAll('[name="tuntype"]'),
-    resultsTag = document.getElementById("ssh-results");
+    
+    var radios = document.getElementsByClassName('tuntype');
 
     for (var i = 0; i < radios.length; i++) {
         if (radios[i].checked) {
             var tuntype = radios[i].value;
         }
     }
+    
+    var sshuser = document.getElementById("ssh-user").value;
+    var resultsTag = document.getElementById("tunnel-results");
+    var localport = document.getElementById("local-port").value;
+    var sshserverip = document.getElementById("ssh-server").value;
+    var remotehostip = document.getElementById("remote-host").value;
+    var sshserverport = document.getElementById("ssh-server-port").value;
+    var remotehostport = document.getElementById("remote-host-port").value;
 
     // dynamic tunnel syntax
     if (tuntype == "dynamic") {
-        var resultsString = `ssh -p ${sshserverport.value} -NfD ${localport.value} ${sshuser.value}@${sshserverip.value}`;
-    // remote tunnel syntax
-    } else if (tuntype == "remote") {
-        var resultsString = `ssh -p ${sshserverport.value} -NfR ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
-    // local tunnel syntax
-    } else if (tuntype == "local") {
-        var resultsString = `ssh -p ${sshserverport.value} -NfL ${localport.value}:${remotehostip.value}:${remotehostport.value} ${sshuser.value}@${sshserverip.value}`
+        var resultsString = `ssh -p ${sshserverport} -NfD ${localport} ${sshuser}@${sshserverip}`;
+    // remote/local tunnel syntax
+    } else if (tuntype == "remote" || tuntype == "local") {
+        var resultsString = `ssh -p ${sshserverport} -Nf${tuntype == "remote" ? "R" : "L"} ${localport}:${remotehostip}:${remotehostport} ${sshuser}@${sshserverip}`
     }
-    var preArea = document.createElement("pre");
-    preArea.innerHTML = resultsString;
-    resultsTag.innerHTML = preArea.innerHTML;
+
+    var para = document.createElement("p");
+    var node = document.createTextNode(resultsString);
+    para.appendChild(node);
+
+    var resultsElement = document.getElementById("generated-results");
+
+    if (resultsElement) {
+        resultsElement.innerHTML = ''; 
+        resultsElement.appendChild(para);
+    } else {
+        resultsElement = document.createElement("pre");
+        resultsElement.setAttribute("id", "generated-results");
+        resultsElement.appendChild(para);
+        resultsTag.appendChild(resultsElement);
+    }
 }
 
 function getNetshInputs() {

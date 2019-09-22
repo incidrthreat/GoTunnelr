@@ -2,37 +2,35 @@
 {{define "page-body"}}
 <div>
     <label>Tunnel Type:</label>
-        <input type="radio" name="tuntype" value="dynamic"> Dynamic
-        <input type="radio" name="tuntype" value="local"> Local
-        <input type="radio" name="tuntype" value="remote"> Remote
+        <input class="tuntype" type="radio" name="tuntype" value="dynamic"> Dynamic
+        <input class="tuntype" type="radio" name="tuntype" value="local"> Local
+        <input class="tuntype" type="radio" name="tuntype" value="remote"> Remote
 </div>
-<div>
+<div id="local-port-container">
     <label>Local Port:</label>
-    <input type="text" name="localport">
+    <input id="local-port" type="text" name="localport">
 </div>
-<div>
+<div id="ssh-user-container">
     <label>SSH User:</label>
-    <input type="text" name="sshuser">
+    <input id="ssh-user" type="text" name="sshuser">
 </div>
-<div>
+<div id="ssh-server-container">
     <label>SSH Server IP:</label>
-    <input type="text" name="sshserverip">
+    <input id="ssh-server" type="text" name="sshserverip">
 </div>
-<div>
+<div id="ssh-server-port-container">
     <label>SSH Server Port:</label>
-    <input type="text" name="sshserverport" value="22">
+    <input id="ssh-server-port" type="text" name="sshserverport" value="22">
 </div>
-<div>
+<div id="remote-host-container">
     <label>Remote Host IP:</label>
-    <input type="text" name="remotehostip">
+    <input id="remote-host" type="text" name="remotehostip">
 </div>
-<div>
+<div id="remote-host-port-container">
     <label>Remote Host Port:</label>
-    <input type="text" name="remotehostport">
+    <input id="remote-host-port" type="text" name="remotehostport">
 </div>
 <div>
     <input type="submit" onclick="getSSHInputs()" value="Create syntax">
 </div>
-<div class="container" id="ssh-results"></div>
-<script src="/static/js/syntax.js"></script>
 {{end}}
