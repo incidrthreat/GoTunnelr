@@ -1,5 +1,5 @@
-{{define "page-title"}}Builder{{end}}
-{{define "page-body"}}
+{{ define "page-title" }} SSH {{ end }}
+{{ define "page-body" }}
 <div>
     <label>Tunnel Type:</label>
         <input class="tuntype" type="radio" name="tuntype" value="dynamic"> Dynamic
@@ -24,7 +24,7 @@
 </div>
 <div id="remote-host-container">
     <label>Remote Host IP:</label>
-    <input id="remote-host" type="text" name="remotehostip">
+    <input id="remote-host" type="text" name="remotehostip" value="localhost">
 </div>
 <div id="remote-host-port-container">
     <label>Remote Host Port:</label>
@@ -33,4 +33,4 @@
 <div>
     <input type="submit" onclick="getSSHInputs()" value="Create syntax">
 </div>
-{{end}}
+{{ end }}
