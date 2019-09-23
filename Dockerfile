@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o gotunnelr ./cmd/GoTunnelr/
+RUN go build -o gotunnelr ./cmd/GoTunnelr/main.go
 
 EXPOSE 8080
 
