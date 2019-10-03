@@ -14,6 +14,14 @@ function init() {
             }
         }
     }
+
+    // hide alerts instead of dismissing them
+    $(function(){
+        $("[data-hide]").on("click", function(){
+            $("." + $(this).attr("data-hide")).hide()
+        })
+    })
+    
 }
 
 
@@ -33,6 +41,12 @@ function getSSHInputs() {
     remotehostip = document.getElementById("remote-host").value,
     sshserverport = document.getElementById("ssh-server-port").value,
     remotehostport = document.getElementById("remote-host-port").value;
+    
+    if (!sshuser) {
+        $('.alert').alert();
+        $('.alert').show();
+
+    }
 
     // dynamic tunnel syntax
     if (tuntype == "dynamic") {
