@@ -1,5 +1,11 @@
 {{ define "page-title" }} SSH {{ end }}
 {{ define "page-body" }}
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <strong>Holy incorrect input Batman!</strong> You should check in on some of those fields below.
+    <button type="button" class="close" data-hide="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
 <div>
     <label>Tunnel Type:</label>
         <input class="tuntype" type="radio" name="tuntype" value="dynamic"> Dynamic
