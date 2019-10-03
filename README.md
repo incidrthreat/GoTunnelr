@@ -8,7 +8,7 @@ Initial setup, no getting started instructions as of right now
 
 ### Prerequisites
 
-Only 3rd party import right now is Gorilla/Mux
+- Gorilla/Mux
 
 ### Installing
 
@@ -32,12 +32,12 @@ If you are interested in contributing to this project please send an email to `i
 
 ## Versioning
 
-Undecided right now
+Still in beta
 
-## Authors
+## Authors/Contributors
 
-* **Incidrthreat** - *Initial work* - [Incidrthreat](https://github.com/incidrthreat)
-
+* *Initial* - [Incidrthreat](https://github.com/incidrthreat)
+* *Contributor* - [Epi](https://github.com/epi052)
 
 ## Acknowledgments
 
