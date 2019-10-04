@@ -17,6 +17,8 @@ func (app *App) RenderHTML(w http.ResponseWriter, r *http.Request, page string, 
 		filepath.Join(app.HTMLDir, "base.html"),
 		filepath.Join(app.HTMLDir, page),
 		filepath.Join(app.HTMLDir, "footer.html"),
+		filepath.Join(app.HTMLDir, "scripts.html"),
+		filepath.Join(app.HTMLDir, "stylesheets.html"),
 	}
 	ts, err := template.ParseFiles(files...)
 
