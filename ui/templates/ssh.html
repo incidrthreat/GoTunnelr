@@ -6,37 +6,62 @@
         <span aria-hidden="true">&times;</span>
     </button>
 </div>
-<div>
-    <label>Tunnel Type:</label>
-        <input class="tuntype" type="radio" name="tuntype" value="dynamic"> Dynamic
-        <input class="tuntype" type="radio" name="tuntype" value="local"> Local
-        <input class="tuntype" type="radio" name="tuntype" value="remote"> Remote
+    
+<div class="row shadow">
+    <div class="col-5 mt-3 mb-3 border-right">
+        <div class="mt-2">
+            <label>Tunnel Type:</label>
+            <input class="tuntype" type="radio" name="tuntype" value="dynamic"> Dynamic
+            <input class="tuntype" type="radio" name="tuntype" value="local"> Local
+            <input class="tuntype" type="radio" name="tuntype" value="remote"> Remote
+        </div>
+        <div id="local-port-container" class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-info text-light">Local Port</span>
+            </div>
+            <input id="local-port" type="text" class="form-control" placeholder="1111" name="localport">
+        </div>
+        <div id="ssh-user-container" class="input-group mt-2">
+            <div class="input-group-prepend">
+                    <span class="input-group-text bg-info text-light">SSH User</span>
+                </div>
+            <input id="ssh-user" type="text" name="sshuser" placeholder="root" class="form-control">
+        </div>
+        <div id="ssh-server-container" class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-info text-light">SSH Server IP</span> 
+                </div>
+            <input id="ssh-server" type="text" name="sshserverip" class="form-control">
+        </div>
+        <div id="ssh-server-port-container" class="input-group mt-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-info text-light">SSH Server Port</span> 
+                </div>
+            <input id="ssh-server-port" type="text" name="sshserverport" placeholder="22" class="form-control">
+        </div>
+        <div id="remote-host-container" class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-info text-light">Remote Host IP</span> 
+            </div>
+            <input id="remote-host" type="text" name="remotehostip" class="form-control">
+        </div>
+        <div id="remote-host-port-container" class="input-group mt-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text bg-info text-light">Remote Host Port</span>
+            </div>
+            <input id="remote-host-port" type="text" name="remotehostport" placeholder="445" class="form-control">
+        </div>
+        <div>
+            <input type="submit" onclick="getSSHInputs()" value="Create syntax" class="btn btn-success mt-2 mb-2 float-right">
+        </div>
+    </div>
+    <div class="col-7">
+        <div class="text-center">
+            <code class="">
+                <div class="align-middle" id="tunnel-results"></div>
+            </code>
+        </div>
+    </div>
 </div>
-<div id="local-port-container">
-    <label>Local Port:</label>
-    <input id="local-port" type="text" name="localport">
-</div>
-<div id="ssh-user-container">
-    <label>SSH User:</label>
-    <input id="ssh-user" type="text" name="sshuser">
-</div>
-<div id="ssh-server-container">
-    <label>SSH Server IP:</label>
-    <input id="ssh-server" type="text" name="sshserverip">
-</div>
-<div id="ssh-server-port-container">
-    <label>SSH Server Port:</label>
-    <input id="ssh-server-port" type="text" name="sshserverport" value="22">
-</div>
-<div id="remote-host-container">
-    <label>Remote Host IP:</label>
-    <input id="remote-host" type="text" name="remotehostip" value="localhost">
-</div>
-<div id="remote-host-port-container">
-    <label>Remote Host Port:</label>
-    <input id="remote-host-port" type="text" name="remotehostport">
-</div>
-<div>
-    <input type="submit" onclick="getSSHInputs()" value="Create syntax">
-</div>
+
 {{ end }}
