@@ -1,12 +1,116 @@
 {{ define "page-title" }}Home{{ end }}
 {{ define "page-body" }}
 {{ if . }}
-    <div>
-        <p class="lead">{{ . }}</p>
-    </div>
+<div>
+  <p class="lead">{{ . }}</p>
+</div>
 {{ else }}
-    <div>
-        <p class="lead">Nothing to see here</p>
+<h1 class="display-3 text-center pb-4">Tunneling Lessons</h1>
+<div class="row">
+  <div class="col-4">
+    <div class="list-group" id="list-tab" role="tablist">
+      <a class="list-group-item list-group-item-action active" id="list-sockets-list" data-toggle="list"
+        href="#list-sockets" role="tab" aria-controls="sockets">Sockets</a>
+      <a class="list-group-item list-group-item-action" id="list-networking-list" data-toggle="list"
+        href="#list-networking" role="tab" aria-controls="networking">Host Networking Analysis</a>
+      <a class="list-group-item list-group-item-action" id="list-sshcommand-list" data-toggle="list"
+        href="#list-sshcommand" role="tab" aria-controls="sshcommand">The Secure Shell (SSH) Command</a>
+        <a class="list-group-item list-group-item-action" id="list-builder-list" data-toggle="list"
+        href="#list-builder" role="tab" aria-controls="builder">SSH Tunnel Builder</a>
     </div>
+  </div>
+  <div class="col-8">
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" id="list-sockets" role="tabpanel" aria-labelledby="list-sockets-list">Lorem
+        ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
+        orci lacus, mollis ac dapibus eget, lacinia ac tellus. Integer rhoncus orci enim, ut congue metus
+        vehicula vel. Nunc sollicitudin dapibus
+        sem, ut consequat tortor eleifend posuere. In iaculis maximus purus vel porta. Proin ac purus tincidunt
+        tortor
+        consectetur pharetra sit amet sed nisl. Vestibulum tincidunt euismod lacus a cursus. Duis mattis
+        eleifend eleifend.
+        Morbi vitae nunc eget turpis varius aliquet vel eget tellus. Suspendisse mi sem, rutrum eget lacus at,
+        fermentum
+        varius diam. Donec sagittis odio sit amet nisi aliquam, nec tincidunt diam mattis. Vivamus ultrices
+        fermentum est
+        condimentum ornare. Cras ut pellentesque enim, eget sodales metus.
+        <br><br>
+        <div class="list-group">
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/sockets"><code>Sockets Refresher</code></a>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="list-networking" role="tabpanel" aria-labelledby="list-networking-list">
+        In this lesson, we will examine common commands for analyzing the current state of a machine as it
+        relates
+        to
+        networking.
+        This section is a fundamental building block of all lessons that follow. The ability to make accurate
+        determinations
+        about
+        the flow of network traffic is incredibly important when trying to manipulate that flow in a way that
+        suits your
+        needs.
+        <br><br>
+        <div class="list-group">
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/ifconfig"><code>ifconfig Analysis</code></a>
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/netstat"><code>netstat Analysis</code></a>
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/iptables"><code>iptables Analysis</code></a>
+
+        </div>
+      </div>
+
+      <div class="tab-pane fade" id="list-sshcommand" role="tabpanel" aria-labelledby="list-sshcommand-list">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur orci lacus, mollis ac dapibus eget,
+        lacinia ac tellus. Integer rhoncus orci enim, ut congue metus vehicula vel. Nunc sollicitudin dapibus
+        sem, ut
+        consequat tortor eleifend posuere. In iaculis maximus purus vel porta. Proin ac purus tincidunt tortor
+        consectetur
+        pharetra sit amet sed nisl. Vestibulum tincidunt euismod lacus a cursus. Duis mattis eleifend eleifend.
+        Morbi vitae
+        nunc eget turpis varius aliquet vel eget tellus. Suspendisse mi sem, rutrum eget lacus at, fermentum
+        varius diam.
+        Donec sagittis odio sit amet nisi aliquam, nec tincidunt diam mattis. Vivamus ultrices fermentum est
+        condimentum
+        ornare. Cras ut pellentesque enim, eget sodales metus.
+
+        <br><br>
+        <div class="list-group">
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/sshintro"><code>SSH Introduction</code></a>
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/sshsyntax"><code>Basic SSH Syntax</code></a>
+          <a class="list-group-item list-group-item-info list-group-item-action"
+            href="/tunnel/sshclioptions"><code>Important CLI Options</code></a>
+        </div>
+        
+      </div>
+      <div class="tab-pane fade" id="list-builder" role="tabpanel" aria-labelledby="list-builder-list">Lorem
+          ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
+          orci lacus, mollis ac dapibus eget, lacinia ac tellus. Integer rhoncus orci enim, ut congue metus
+          vehicula vel. Nunc sollicitudin dapibus
+          sem, ut consequat tortor eleifend posuere. In iaculis maximus purus vel porta. Proin ac purus tincidunt
+          tortor
+          consectetur pharetra sit amet sed nisl. Vestibulum tincidunt euismod lacus a cursus. Duis mattis
+          eleifend eleifend.
+          Morbi vitae nunc eget turpis varius aliquet vel eget tellus. Suspendisse mi sem, rutrum eget lacus at,
+          fermentum
+          varius diam. Donec sagittis odio sit amet nisi aliquam, nec tincidunt diam mattis. Vivamus ultrices
+          fermentum est
+          condimentum ornare. Cras ut pellentesque enim, eget sodales metus.
+          <br><br>
+          <div class="list-group">
+            <a class="list-group-item list-group-item-info list-group-item-action"
+              href="/tunnel/ssh"><code>SSH Tunnel Builder</code></a>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+
+
 {{ end }}
 {{ end }}

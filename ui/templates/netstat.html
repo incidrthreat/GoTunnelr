@@ -1,0 +1,310 @@
+{{ define "page-title" }} netstat Analysis {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center"><code>netstat</code></h2>
+
+  <!-- wp:heading -->
+  <h2>Introduction</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p><code>netstat</code> is a tool that we'll use mainly for printing network connections. Our use case is
+    determining with whom our current box is communicating. <code>netstat</code> is capable of doing more than only
+    showing us network connections, however that is our primary focus. Determining communications between hosts is
+    critical in understanding how tunnels work as well as ensuring that your traffic is going through your tunnel
+    and not around. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>netstat</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>default behavior</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>We'll begin by taking a look at <code>netstat</code>'s default behavior. When <code>netstat</code> is invoked
+    without any options or arguments, it displays a list of open, non-listening sockets that have established
+    connections. Because no address families (inet, inet6, unix, etc...) are specified, active sockets of all
+    address family types will be shown. If you run <code>netstat</code> on <strong>luke</strong>, you're likely to
+    see only unix sockets displayed, because there (likely) aren't any active tcp connections yet.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+Active UNIX domain sockets (w/o servers)
+Proto RefCnt Flags       Type       State         I-Node   Path
+unix  2      [ ]         DGRAM                    20939    /run/user/1000/systemd/notify
+unix  2      [ ]         DGRAM                    13456    /run/systemd/journal/syslog
+unix  3      [ ]         DGRAM                    13179    /run/systemd/notify
+unix  14     [ ]         DGRAM                    13189    /run/systemd/journal/dev-log
+
+----8&lt;----</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>Even without any tcp connections, the output given while we're checking out default behavior let's us start the
+    conversation about the output columns. Though, we're only going to concentrate on those columns that get us
+    closer to our goal of understanding who is communicating with whom.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><code>Proto</code> - the type of socket listed (tcp, tcp6, udp, unix, etc...)</li>
+    <li><code>Local Address</code> - the address and port number of the local end of the socket</li>
+    <li><code>Foreign Address</code> - the address and port number of the remote end of the socket</li>
+    <li><code>State</code> - state of the socket (may be blank when viewing UDP/raw mode)</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>Socket states deserve some explanation as well. These states tell us things like which interface is handling
+    connections for a particular service and the current status of a TCP connection. There are quite a few more
+    states that a socket can enter, but we'll focus on what's important to us.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:table {"className":"is-style-stripes"} -->
+  <table class="wp-block-table is-style-stripes">
+    <tbody>
+      <tr>
+        <td>LISTEN</td>
+        <td>The socket is listening for incoming connections </td>
+      </tr>
+      <tr>
+        <td>SYN_SENT</td>
+        <td>The socket is actively attempting to establish a connection</td>
+      </tr>
+      <tr>
+        <td>ESTABLISHED</td>
+        <td>3-way handshake complete, connection between local address and foreign address is active</td>
+      </tr>
+      <tr>
+        <td>CLOSE_WAIT</td>
+        <td>The connection is closed, but the application in charge of the socket hasn't torn down the socket
+          yet</td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- /wp:table -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Common Options</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Now that we know the basics, let's take a look at some options commonly used with <code>netstat</code>. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><code>-a</code> - show both listening and non-listening sockets</li>
+    <li><code>-n</code> - show numeric addresses instead of trying to resolve host, port, or user names</li>
+    <li><code>-l</code> - show only listening sockets</li>
+    <li><code>-p</code> - show the Process ID (PID) and name of the program to which each socket belongs</li>
+    <li></li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>A relatively sane set of default options to use with <code>netstat</code> is <code>-anp</code>; show
+    listening/non-listening sockets, don't resolve DNS/ports, and display PID/program name. Those options in
+    addition to the information displayed normally is likely to handle 98.41% of our <code>netstat</code> needs.
+    Let's take a look at some example output with those default options, because they'll add a few additional
+    columns we've yet to discuss. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+udp    26688      0 0.0.0.0:5353            0.0.0.0:*                           -                   
+
+----8&lt;----</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:code -->
+  <pre
+    class="wp-block-code"><code>(Not all processes could be identified, non-owned process info will not be shown, you would have to be root to see it all.)</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>The very first thing we see is a message about processes not being identified. This is because we used
+    <code>-p</code>, but did not run the command as root. If we want to view the <code>PID/Program name</code> of
+    processes owned by other users on the box, we need to run the command as root. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>Let's rerun the command as root and analyze the first few entries to ensure we understand all the information
+    presented. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>vagrant@luke:~$ sudo netstat -anp
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      262/systemd-resolve 
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      434/sshd            
+tcp6       0      0 :::22                   :::*                    LISTEN      434/sshd            
+udp    26688      0 0.0.0.0:5353            0.0.0.0:*                           348/avahi-daemon: r 
+udp        0      0 0.0.0.0:40309           0.0.0.0:*                           348/avahi-daemon: r 
+</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>Below, we have a <strong>tcp</strong> socket, that is <strong>LISTEN</strong>ing on the loopback interface with
+    an ipv4 address of <code>127.0.0.53</code> on port <code>53</code>. That means if we want to connect to port
+    <code>53</code> on this machine, we have to direct that traffic at <code>127.0.0.53</code>. When a socket is in
+    a listening state, the foreign address is usually <code>0.0.0.0:*</code> or <code>:::*</code>, this means that
+    the socket accepts connections from any foreign address. Process ID <code>262</code> owns the socket and the
+    program associated with PID <code>262</code> is <code>systemd-resolve</code>. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre
+    class="wp-block-code"><code>tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      262/systemd-resolve</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>In the next example (below), we have similar output, however this socket is listening on <code>0.0.0.0</code>,
+    port <code>22</code>. When a socket is listening and has a local address of <code>0.0.0.0:PORT</code> or
+    <code>:::PORT</code>, it means that it will accept connections to that port on ALL interfaces. In this case,
+    <strong>luke</strong>, will accept inbound ssh connections on any of its three interfaces. We know this is the
+    ssh service based on both the use of the default port along with the fact that the program name is
+    <code>sshd</code>.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre
+    class="wp-block-code"><code>tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      434/sshd</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>That takes care of listening sockets, now let's create a connection and see what that looks like. We can
+    demonstrate a connection in a few ways, but we'll just fire up two netcat commands. First, we'll use netcat to
+    listen on port <code>12345</code>, specifically on <code>192.168.200.3</code>.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>vagrant@luke:~$ nc -nvl 192.168.200.3 -p 12345
+Listening on [192.168.200.3] (family 0, port 12345)</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>With that done, we'll use a different terminal window to connect to the listener with netcat. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>vagrant@luke:~$ nc -nv 192.168.200.3 12345
+Connection to 192.168.200.3 12345 port [tcp/*] succeeded!</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>After running the command above, you should see in the listener's window that a connection was received. Now to
+    see what all this looks like in <code>netstat</code>. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>tcp        0      0 192.168.200.3:12345     0.0.0.0:*               LISTEN      2862/nc
+tcp        0      0 192.168.200.3:12345     192.168.200.3:48944     ESTABLISHED 2862/nc
+tcp        0      0 192.168.200.3:48944     192.168.200.3:12345     ESTABLISHED 2875/nc</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>The first line is the netcat listener. It is only listening on a single interface/ip address. The second line is
+    the listener's side of the established connection. We know that because the local address is
+    <code>192.168.200.3:12345</code>. The third line is the client's side of the established connection (the window
+    we used to connect to the listener). We see that the local address has a random high port (aka ephemeral port)
+    connected to a foreign address of <code>192.168.200.3:12345</code>. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>When we see client side connections in the future, we'll see some interface:port we own locally reaching out to a
+    service on a remote host. We're now ready to accurately analyze network connections via <code>netstat</code>.
+    For funsies, take a moment and check <code>netstat</code>'s output on your host machine (if you're on windows,
+    try just <code>netstat -an</code>). What connections does your machine have open and established? Who owns those
+    ip addresses/hosts? </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>ss</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Similar to <code>ifconfig</code>, <code>netstat</code> is a deprecated utility. Also similar to
+    <code>ifconfig</code>, there'll be times when <code>netstat</code> will be your only tool and there will be
+    times when its replacement, <code>ss</code>, will be your only tool. Let's take a moment to briefly explore
+    <code>ss</code>. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>default behavior</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p><code>ss</code> is another utility to investigate sockets. You can think of it as shorthand for
+    <strong>socket&nbsp;statistics</strong>. When run without options, <code>ss</code> displays a list of open,
+    non-listening sockets that have established connections. Here's a run of <code>ss</code> without any options.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>vagrant@luke:~$ ss
+Netid   State   Recv-Q   Send-Q  Local Address:Port              Peer Address:Port
+u_str   ESTAB   0        0       /var/run/dbus/system_bus_socket 16410 * 16400          
+u_str   ESTAB   0        0       /var/run/dbus/system_bus_socket 16719 * 16718          
+----8&lt;----</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>As we can see by the headers in the output, the information displayed is very similar to what we saw using
+    <code>netstat</code>. The only thing that may require explanation is the <code>Netid</code> column. The
+    <code>Netid</code> is analagous to the <code>Proto</code> column in <code>netstat</code>'s output.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Common Options</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><code>-a</code> - Display both listening and non-listening (for TCP this means established connections)
+      sockets.</li>
+    <li><code>-p</code> - Show process using socket.</li>
+    <li><code>-u</code> - Display UDP sockets.</li>
+    <li><code>-n</code> - Do not try to resolve service names.</li>
+    <li><code>-t</code> - Display TCP sockets.</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>Our sane defaults for <code>ss</code> are <code>-punta</code>. Here is an example run with another netcat
+    listener/client setup for demonstrative purposes.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>vagrant@luke:~$ ss -punta
+Netid     State       Recv-Q      Send-Q            Local Address:Port              Peer Address:Port                                          
+udp       UNCONN      27328       0                       0.0.0.0:5353                   0.0.0.0:*
+udp       UNCONN      0           0                       0.0.0.0:40309                  0.0.0.0:*
+udp       UNCONN      10560       0                 127.0.0.53%lo:53                     0.0.0.0:*
+udp       UNCONN      1984        0                       0.0.0.0:68                     0.0.0.0:*
+udp       UNCONN      9856        0                          [::]:5353                      [::]:*   
+udp       UNCONN      0           0                          [::]:33893                     [::]:*   
+tcp       LISTEN      0           128               127.0.0.53%lo:53                     0.0.0.0:*
+tcp       LISTEN      0           128                     0.0.0.0:22                     0.0.0.0:*
+tcp       LISTEN      0           1                 192.168.200.3:4444                   0.0.0.0:*           users:(("nc",pid=3748,fd=3))
+tcp       ESTAB       0           0                 192.168.200.3:50868            192.168.200.3:4444        users:(("nc",pid=3749,fd=3))
+tcp       ESTAB       0           0                 192.168.200.3:4444             192.168.200.3:50868       users:(("nc",pid=3748,fd=4))
+tcp       LISTEN      0           128                        [::]:22                        [::]:*</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>As we can see, the same essential information is displayed to us, just in a slightly different format. </p>
+  <!-- /wp:paragraph -->
+  {{ end }}

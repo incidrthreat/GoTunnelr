@@ -21,7 +21,7 @@ function init() {
             $("." + $(this).attr("data-hide")).hide()
         })
     })
-    
+        
 }
 
 $('.dropdown-menu a.dropdown-toggle').on('click', function(e) {

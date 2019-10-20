@@ -28,11 +28,6 @@
             <li>
               <a class="dropdown-item" href="/tunnel/sockets">Sockets</a>
             </li>
-            <li>
-              <a class="dropdown-item" href="/tunnel/ssh">SSH Tunnel Builder</a>
-
-              <a class="dropdown-item" href="/tunnel/networking"></a>
-            </li>
             <li class="dropdown-submenu dropright">
               <a class="dropdown-item dropdown-toggle" href="#">Host Networking Analysis</a>
               <ul class="dropdown-menu">
@@ -42,20 +37,40 @@
                 <li>
                   <a class="dropdown-item" href="/tunnel/netstat">netstat Analysis</a>
                 </li>
+                <li>
+                  <a class="dropdown-item" href="/tunnel/iptables">iptables Analysis</a>
+                </li>
               </ul>
+            </li>
+            <li class="dropdown-submenu dropright">
+                <a class="dropdown-item dropdown-toggle" href="#">The SSH Command</a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item" href="/tunnel/sshintro">SSH Introduction</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/tunnel/sshsyntax">Basic SSH Syntax</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="/tunnel/sshclioptions">Important CLI Options</a>
+                  </li>
+                </ul>
+              </li>
+            <li>
+              <a class="dropdown-item" href="/tunnel/ssh">SSH Tunnel Builder</a>
             </li>
           </ul>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/tunnel/netsh">Netsh Tunnels</a>
-          </li>
-      
+          <a class="nav-link" href="/tunnel/netsh">Netsh Tunnels</a>
+        </li>
+
       </ul>
     </div>
     </ul>
     </div>
   </nav>
-  <div class="container page-content">
+  <div class="container" id="page-content">
     {{ template "page-body" . }}
   </div>
   {{ template "footer" }}

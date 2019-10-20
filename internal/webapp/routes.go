@@ -14,7 +14,12 @@ func (app *App) Routes() *mux.Router {
 	r.HandleFunc("/tunnel/ssh", app.GetSSHTunnel).Methods("GET")
 	r.HandleFunc("/tunnel/netsh", app.GetNetshTunnel).Methods("GET")
 	r.HandleFunc("/tunnel/sockets", app.GetSSHSockets).Methods("GET")
-	r.HandleFunc("/tunnel/networking", app.GetSSHNetworking).Methods("GET")
+	r.HandleFunc("/tunnel/ifconfig", app.GetSSHifconifg).Methods("GET")
+	r.HandleFunc("/tunnel/netstat", app.GetSSHNetstat).Methods("GET")
+	r.HandleFunc("/tunnel/iptables", app.GetSSHiptables).Methods("GET")
+	r.HandleFunc("/tunnel/sshintro", app.GetSSHIntro).Methods("GET")
+	r.HandleFunc("/tunnel/sshsyntax", app.GetSSHSyntax).Methods("GET")
+	r.HandleFunc("/tunnel/sshclioptions", app.GetSSHCLIOptions).Methods("GET")
 	
 
 	// static folder linking
