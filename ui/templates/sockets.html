@@ -1,0 +1,76 @@
+{{ define "page-title" }} Sockets {{ end }}
+{{ define "page-body" }}
+<h1 class="text-center display-2">What is a socket?</h1>
+<!-- wp:paragraph -->
+<p>This lesson will not cover the breakdown of TCP or UDP headers/packets.  However, if you are unfamiliar and want to know more, here are a few sites that do a great job explaining this subject:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><a href="https://www.lifewire.com/tcp-headers-and-udp-headers-explained-817970">Lifewire.com</a> - TCP Headers and UDP headers </li><li><a href="https://www.tutorialspoint.com/ipv4/ipv4_packet_structure.htm">Tutorialspoint.com</a> - IPv4 Packet Structure </li><li><a href="https://networklessons.com/cisco/ccnp-route/tcp-header">Networklessons.com</a> - TCP Header</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Sockets </h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Networking typically involves communication between two distinct endpoints on a network.  Each of these endpoints is commonly associated with a host and a socket.  A single socket is one endpoint of a two-way link between a server and client operating on a network.  Sockets are bound to a port so that the Transmission Control Protocol (TCP) layer can identify the application and destination the data will be sent.  Having the ability to connect and/or provide this service is the fundamental aspect of availability.  While a sockets usefulness to send and receive data is a great idea, these services can also provide an opening into a network that can/will be exploited by a malicious actor.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p> A socket, in layman's terms,  is an entry point into a network that allows an application to transfer or receive data in an end-to-end manner.  There are three types of sockets to be covered: Transmission Control Protocol (TCP), User Datagram Protocol (UDP), and RAW.  Each network socket type is typically requested by the initiating application and is usually handled by the host Operating System (OS).  The OS is responsible for managing these sockets. This ensures all inbound and outbound traffic is passed to the correct protocol and application. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>TCP/UDP</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p> When a network application requests a socket, it generally only needs to know what type of socket to request (usually TCP or UDP) and which port number to use, relying on the OS to handle transport layer functionality such as three-way handshakes and socket tear-downs. Raw sockets differ in this aspect as they do not have transport layer functionality  built into them.  Any traffic sent and received must be managed by the application setting up the raw socket, this includes the tear-down process. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>TCP sockets cannot communicate with UDP sockets and vice versa.  TCP sockets are reliable and connection-oriented, which means that there is a handshake and error checking involved when transferring data.  UDP, on the other hand, is connection-less, which means that there is no handshake or error checking involved.  Each socket that makes a connection almost always has an associated host.  Combined, this logical connection of two sockets is sometimes referred to as a socket pair.  In addition to what transport protocol layer (TCP or UDP) being used, this pair will also consist of an IP address and a port number for both the source and destination hosts.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Sockets, in relation to their applications, can be considered either listeners or initiators.  A listening socket, often referred to as a server, opens a predetermined port and will wait for an incoming connection.  An initiating socket, often referred to as a client, will be assigned the next available <a href="https://en.wikipedia.org/wiki/Ephemeral_port">ephemeral port</a> on the system and then attempts to establish a connection to the "server".  Again, all setup and tear-down of this process is handled by the host OS.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>RAW</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>RAW sockets are a network socket that, without going through the normal layers of encapsulation and de-encapsulation, allow the user/application to direct the sending and receiving data without a protocol-specific transport layer format.  This allows the packet to pass directly to the application that needs it without the transport layer needing to read and alter the packet.  RAW sockets were originally intended to assist programmers developing new transport-layer protocols by allowing raw traffic to remain unchanged until it reaches the targeted application.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>As most readers know, anything that is intended for good can be used for bad.  Malicious actors can use raw sockets to craft special packets destined for specific targets.  This means that these actors can insert spoofed data such as source/destination <a href="https://en.wikipedia.org/wiki/IP_address">IP addresses</a> (transport layer) and <a href="https://en.wikipedia.org/wiki/MAC_address">MAC addresses</a> (IP Layer).  Generally this spoofed data is inserted into the RAW packet locally and will contain the destination IP address of the target in the IP layer and then forwarded to the target.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>RAW socket shortfall</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>While RAW sockets work by design on UNIX systems, one of the shortfalls for RAW sockets is MS Windows, specifically Windows Vista+.  On Windows Vista+ the ability to send traffic over RAW sockets has been restricted in 2 ways:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li>TCP data cannot be sent over RAW sockets</li><li>UDP data with an invalid source address cannot be sent over RAW sockets.  The IP source address for any outgoing data must exist on a network interface, or the data will be dropped.  This change was made to limit the ability to send spoofed packets of malicious code to create Distributed Denial of Service attacks.</li><li> </li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>NOTE: The above restrictions do not apply to Windows Server 2003+ or versions of Windows earlier than Windows XP SP2.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Summary</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>How an attacker proceeds will depend on their ultimate goal.  If an attacker wants the target host to call back, a reverse tunnel on the hop point connecting back to the attacker host is required.  Or if the attacker wants to implant a listener, a local forward tunnel connection at the real target is required ( between the attackers host and the hop point).  In both mentioned cases the attacker would then attempt a connection to the local address and local port of the attacking box made available.  Later in this lesson we'll run through some exercises to help clear any confusion there may be about reverse and forward tunnels.</p>
+<!-- /wp:paragraph -->
+
+{{ end }}

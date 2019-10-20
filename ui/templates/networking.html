@@ -1,0 +1,242 @@
+
+{{ define "page-title" }} Host Networking Configurations {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center">Host Networking Analysis</h1>
+
+<p>In this lesson, we will examine common commands for analyzing the current state of a machine as it relates to networking.  This section is a fundamental building block of all lessons that follow.  The ability to make accurate determinations about the flow of network traffic is incredibly important when trying to manipulate that flow in a way that suits your needs.  </p>
+
+<h1 class="display-4 text-center"><code>ifconfig</code></h2>
+<!-- wp:heading -->
+<h2>Introduction</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><code>ifconfig</code> (short for <strong>interface&nbsp;configuration</strong>) is a command that is used to both view and configure networking interfaces on UNIX and Unix-like systems (Linux falls into the latter category). Because the overall goal of the course is to demystify tunneling, we won't concern ourselves with the configuration capabilities of <code>ifconfig</code>, since those settings will already be in place on target machines in the lab. The desired learning outcome for this topic is the ability to interpret the output displayed by <code>ifconfig</code> when viewing an interface.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>What is an interface?</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>A&nbsp;<strong>network interface</strong>&nbsp;is really just a fancy term that describes the connection between a computer and a network.  On Linux, there are two basic types of network interfaces: <strong>physical</strong> and <strong>virtual</strong>.  Let's take a moment and discuss both types of network interfaces along with some common examples of each.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Physical Network Interfaces</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Physical interfaces generally represent some sort of physical hardware with a corresponding device driver loaded into the kernel. The physical hardware in question is usually either a Network Interface Card or a Wireless version of the same. Some common examples of different names used to identify physical network interfaces are as follows:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><code>eth0</code>, <code>eth1</code>, <code>eth2</code>, etc...</li><li><code>wlan0</code>, <code>wlan1</code>, <code>wlan2</code>, etc...</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>The examples above map to <strong>Eth</strong>ernet interfaces and <strong>W</strong>ireless interfaces, respectively. These are two very common naming conventions for physical network interfaces but there are others out there. The naming convention for interfaces varies from operating system to operating system. For instance, on operating systems that use <strong>systemd</strong> as their init system, network interfaces are named using <a rel="noreferrer noopener" aria-label="Predictable Network Interface Names (opens in a new tab)" href="https://www.freedesktop.org/wiki/Software/systemd/PredictableNetworkInterfaceNames/" target="_blank">Predictable Network Interface Names.</a> An example:</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><code>enp0s25</code></li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>This is just another Ethernet interface, however, we can glean some information from this naming convention. For instance, the example above tells us that this particular interface sits on pci bus 0, slot 2. That information is not terribly relevant, other than that it arms us with the knowledge that even though we may encounter interface names that aren't <code>eth0</code>, <code>eth1</code>, etc... We'll still understand their fundamental capability of connecting the operating system to the network. Our attack-box, <strong>luke</strong>, uses Predictable Network Interface Names, which we'll see in practice shortly.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3>Virtual Network Interfaces</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Virtual network interfaces are software implementations of network interfaces that may or may not be linked to a physical piece of hardware.  Virtual network interfaces may come in the form of vlans, tuns, taps, bridges, bonds, teams, dummy interfaces, etc...  One virtual interface you're most likely already familiar with is the <strong>loopback</strong> interface. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":4} -->
+<h4>The Loopback Interface</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The loopback interface is used by the operating system to send network traffic to itself.  One benefit of this type of internal addressing is that the traffic sent to and received from loopback doesn't use or require a physical device to function.  The loopback interface can be used for troubleshooting/diagnostics due to the fact that even if ethernet cables are unplugged or wifi isn't functioning, host-only traffic can still flow.  It's also important from a security standpoint; there are many services that should not be exposed to even internal network traffic because they are inherently insecure (the docker api comes to mind, as well as certain NoSQL databases).  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The loopback interface usually has an assigned IP address of <code>127.0.0.1/8</code> however, any address in that subnet will be routed to the loopback interface. We can see this in action by running ping against addresses like <code>127.1.1.1</code> and <code>127.127.127.127</code>. Normally, there is also an entry in <code>/etc/hosts</code> that allows us to just use the hostname <strong>localhost</strong> instead of any of the myriad 127.* addresses.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ping -c 1 127.127.127.127
+PING 127.127.127.127 (127.127.127.127) 56(84) bytes of data.
+64 bytes from 127.127.127.127: icmp_seq=1 ttl=64 time=0.031 ms
+
+--- 127.127.127.127 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.031/0.031/0.031/0.000 ms</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ping -c 1 localhost
+PING localhost (127.0.0.1) 56(84) bytes of data.
+64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.032 ms
+
+--- localhost ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.032/0.032/0.032/0.000 ms</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>The key takeaway from this section we'll need going forward is this:  <strong>The&nbsp;loopback&nbsp;interface&nbsp;is&nbsp;how&nbsp;the&nbsp;operating&nbsp;system&nbsp;communicates&nbsp;with&nbsp;itself.</strong>  The loopback interface will play a crucial role in most, if not all, of the tunneling exercises later in the course.  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>ifconfig </h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>The background about devices may seem tedious, but it's outlined to give us all an even playing field when discussing things like dual-homed machines, identifying ip addresses and which interface they're routing through.  Without further ado, let's jump into the <code>ifconfig</code> command itself. </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Due to the discussion above, you already know about one of the interfaces located on your machine.  Let's take a look at how to query the configuration of the loopback interface on <strong>luke</strong>.  We can start by running <code>ifconfig</code> without any options/arguments.  When we do this, we see all of the active interfaces, </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ifconfig
+enp0s3: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+        inet6 fe80::7b9f:ffa7:d2f0:6e27  prefixlen 64  scopeid 0x20&lt;link>
+        ether 08:00:27:fe:ab:26  txqueuelen 1000  (Ethernet)
+        RX packets 23  bytes 5418 (5.4 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 52  bytes 6733 (6.7 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+enp0s8: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.200.3  netmask 255.255.255.0  broadcast 192.168.200.255
+        inet6 fe80::a00:27ff:fef6:e2c5  prefixlen 64  scopeid 0x20&lt;link>
+        ether 08:00:27:f6:e2:c5  txqueuelen 1000  (Ethernet)
+        RX packets 51  bytes 4386 (4.3 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 38  bytes 4624 (4.6 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 64  bytes 5378 (5.3 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 64  bytes 5378 (5.3 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>That's certainly useful, but we can be a bit more targeted in our configuration query by specifying exactly which interface we would like more information about. This is accomplished by placing an interface name after <code>ifconfig</code>. The interface name for loopback is (on most systems) <code>lo</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ifconfig lo
+lo: flags=73&lt;UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 64  bytes 5378 (5.3 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 64  bytes 5378 (5.3 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>Much better!  Now that we have loopback's configuration, we'll break down a few of the pieces of information returned to us.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:list -->
+<ul><li><code>inet</code> - IPv4 address assigned to the interface</li><li><code>netmask</code> -  IPv6 network mask</li><li><code>inet6</code> - IPv6 address assigned to the interface</li><li><code>prefixlen</code> - IPv6 network mask </li><li><code>scopeid</code> - IPv6 scope ID</li><li><code>RX packets/bytes</code> - # of packets/bytes received </li><li><code>TX packets/bytes</code> - # of packets/bytes transmitted</li></ul>
+<!-- /wp:list -->
+
+<!-- wp:paragraph -->
+<p>Now that we've seen loopback, let's explore the differences between the loopback interface and an ethernet interface by running <code>ifconfig</code> on the <code>enp0s3</code> interface.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ifconfig enp0s3
+enp0s3: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+        inet6 fe80::7b9f:ffa7:d2f0:6e27  prefixlen 64  scopeid 0x20&lt;link>
+        ether 08:00:27:fe:ab:26  txqueuelen 1000  (Ethernet)
+        RX packets 22  bytes 5900 (5.9 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 52  bytes 7015 (7.0 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>The primary difference that concerns us is the inclusion of the <code>ether</code> attribute. The associated value is the Media Access Control (MAC) address. Every physical interface has a MAC address, also known as its hardware address. Virtual interfaces like the loopback interace and tun/tap interfaces don't have the <code>ether</code> value set because there is no physical hardware underneath.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>ip</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>In the interest of completeness, we'll also take a look at the <code>ip</code> command.  The <code>ifconfig</code> command discussed above was <strong>deprecated</strong> in favor of a suite of commands in the iproute2 package.  Notably, the <code>ip</code> command replaces <code>ifconfig</code>, <code>arp</code>, <code>route</code>, and others.  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>We're interested in both <code>ifconfig</code> and <code>ip</code> because on some systems, only <code>ifconfig</code> is available. On other systems, only <code>ip</code> is available. However, on a wide array of Linux distributions, both commands are available and we can choose to use the one with which we are most comfortable.  Let's take a look at output from <code>ip</code>.  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre class="wp-block-code"><code>vagrant@luke:~$ ip addr show enp0s3
+2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:fe:ab:26 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic noprefixroute enp0s3
+       valid_lft 83794sec preferred_lft 83794sec
+    inet6 fe80::7b9f:ffa7:d2f0:6e27/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:paragraph -->
+<p>As expected of a command that replaces <code>ifconfig</code>, we are presented with a little bit more information in a slightly different format.  Notice that the command to view a single interface is <code>ip&nbsp;addr&nbsp;show&nbsp;INTERFACE</code>.  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>We can also view all interfaces by simply running <code>ip&nbsp;addr</code> (technically <code>ip&nbsp;a</code> is enough, but when training yourself to remember this particular switch, <code>addr</code> is easier to remember than <code>a</code>).  </p>
+<!-- /wp:paragraph -->
+
+<!-- wp:code -->
+<pre ><code>vagrant@luke:~$ ip addr
+1: lo: &lt;LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: enp0s3: &lt;BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:fe:ab:26 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.2.15/24 brd 10.0.2.255 scope global dynamic noprefixroute enp0s3
+       valid_lft 83587sec preferred_lft 83587sec
+    inet6 fe80::7b9f:ffa7:d2f0:6e27/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: enp0s8: &lt;BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 08:00:27:f6:e2:c5 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.200.3/24 brd 192.168.200.255 scope global noprefixroute enp0s8
+       valid_lft forever preferred_lft forever
+    inet6 fe80::a00:27ff:fef6:e2c5/64 scope link 
+       valid_lft forever preferred_lft forever</code></pre>
+<!-- /wp:code -->
+
+<!-- wp:heading -->
+<h2>Summary</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Having read through the material above, we are prepared to answer simple questions about Linux interface configuration settings.  We should be able to, at a minimum, determine how many networks a given machine can interact with as well as the ip address(es) that same machine is assigned.</p>
+<!-- /wp:paragraph -->
+
+
+
+{{ end }}
