@@ -1,0 +1,306 @@
+{{ define "page-title" }} iptables Analysis {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center"><code>iptables</code></h2>
+
+  <!-- wp:heading -->
+  <h2>Introduction</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The iptables command allows us to manage our host-based firewall. &nbsp;This command can tell the kernel whether
+    it should accept, drop, or forward inbound and outbound traffic. &nbsp;iptables accomplishes this through the
+    use of <strong>tables</strong>, <strong>chains</strong>, <strong>rules</strong>, and <strong>policies</strong>.
+    &nbsp;A table is made up of sets of chains. Chains consist of sets of rules, and each chain has a default
+    policy. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>While iptables is certainly used for firewall management, administering a firewall is not our concern. Our focus
+    in learning about iptables is centered around reading and understanding the rules that are already configured.
+    Whether you're from a red or blue background, you're generally not permitted to change configurations of
+    machines to suit your personal desires. To that end, we need to be able to move throughout networks within the
+    established guidelines of how their traffic moves. Let's get started! </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>iptables</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>General Behavior</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>When iptables inspects a packet, it first identifies which table is applicable given the current packet. There
+    are multiple tables, however our discussion will focus solely on the <strong>filter</strong> table for now. Some
+    of the other tables and chains will come into play later when we take a look at advanced traffic manipulation.
+    Once a table is selected, iptables determines which chain of rules the packet should be validated against.
+    &nbsp;If the packet is inbound to the system, by default, iptables will use the INPUT chain. &nbsp;On the other
+    hand, if the system is sending a packet to some other machine, iptables will use the OUTPUT chain. &nbsp;Once a
+    chain is selected, iptables validates the packet against each rule in the chain, in order, from top to bottom.
+    &nbsp;Each rule defines specific behavior in the event that rule is triggered by a packet. &nbsp;For instance,
+    iptables could be configured to ACCEPT an inbound SSH connection. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>There are three main actions (also known as <strong>targets</strong>) that a rule can specify to take against a
+    packet; ACCEPT, REJECT, and DROP. ACCEPT allows the packet to continue onto its destination. &nbsp;REJECT does
+    not allow the packet to proceed, and sends an error back to the source. &nbsp;DROP silently does not allow the
+    packet to proceed. &nbsp;Each chain has a default policy of ACCEPT, REJECT, DROP. &nbsp;In the event that no
+    rule in the chain is triggered by the packet, iptables applies the default policy of that chain to the packet.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example Rule</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Let’s breakdown an example rule definition. &nbsp;The rule below will configure the system to allow inbound
+    traffic on tcp port 22. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>iptables -A INPUT -p tcp --dport 22 -j ACCEPT</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><code>iptables</code> – the iptables command </li>
+    <li><code>-A INPUT</code> – <strong>Append</strong> the rule to the INPUT chain</li>
+    <li><code>-p tcp</code> – only apply this rule to TCP packets</li>
+    <li><code>--dport 22</code> – only apply this rule to packets bound for port 22</li>
+    <li><code>-j ACCEPT</code> – if this rule is triggered, ACCEPT the packet (<strong>Jump</strong> to the ACCEPT
+      <strong>target</strong>)</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>There are many more options that could have been configured with the rule, but were omitted to maintain
+    simplicity.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>Viewing iptables rules can be done with <code>iptables -nvL</code>. &nbsp;Below is what the view of this rule
+    would look like. &nbsp;We'll use the optional argument to <code>-L</code> to tell iptables that we are only
+    interested in viewing the INPUT chain</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>iptables -nvL INPUT
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source       destination         
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0    0.0.0.0/0            tcp dpt:22</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Packet States</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>On the topic of rules, another common rule configuration to see in use describes the <strong>state</strong> of a
+    packet. Packets fall into five possible states, three of which concern us. Those three are: </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><strong>NEW</strong> - the packet has started a new connection, or otherwise associated with a connection
+      which has not seen packets in both directions. For example, if we see a SYN packet and it is the first
+      packet in a connection, it will match.</li>
+    <li><strong>ESTABLISHED</strong> - the packet is associated with a connection which has seen packets in both
+      directions. For a packet to enter an ESTABLISHED state, one host must have sent a packet, and a reply to the
+      same packet from its recipient must be received. </li>
+    <li><strong>RELATED</strong> - the packet is starting a new connection, but is associated with an existing
+      connection. iptables considers a connection to be <strong>RELATED</strong> when it is related to an already
+      <strong>ESTABLISHED</strong> connection.&nbsp; This happens when the <strong>ESTABLISHED</strong> connection
+      spawns a connection outside of the primary connection. Examples include an ICMP error, or a packet
+      establishing an ftp data connection.</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>The states provide additional context to a rule that uses them and are simply another piece of the rule that the
+    packet must conform to in order to match that particular rule. Here is our example rule from above extended to
+    include the NEW state. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>iptables -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:code -->
+  <pre
+    class="wp-block-code"><code>iptables -nvL
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 ACCEPT     tcp  --  *      *       0.0.0.0/0            0.0.0.0/0            state NEW tcp dpt:22</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>Specifying <strong>-m state</strong> allows an additional <strong>--state</strong> option, which is a
+    comma-separated list of states to match. These can be any of the three discussed above. The example rule used to
+    allow any type of packet to port 22. Now, it only allows packets that are reaching out to create a new
+    connection. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>Does this rule seem problematic? The answer is: it depends. If this were the ONLY rule, SYN packets to 22 would
+    be fine, but any other traffic to port 22 would not match this rule. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>A very common use of RELATED and ESTABLISHED is as follows:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>This rule essentially says "anything I initiated, please allow through". This rule would have handled the case
+    where we only accepted NEW connections on port 22. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Rules and Policies</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Consider the following INPUT chain (located in the default filter table):</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>Chain INPUT (policy ACCEPT 38M packets, 53G bytes)
+ pkts bytes target     prot opt in     out    source       destination         
+44859 3096K ACCEPT     udp  --  *      *      0.0.0.0/0    0.0.0.0/0            udp dpt:1111
+   42  2645 ACCEPT     tcp  --  *      *      0.0.0.0/0    0.0.0.0/0            tcp dpt:1111
+  848  278K ACCEPT     udp  --  *      *      0.0.0.0/0    0.0.0.0/0            udp dpt:67
+    0     0 ACCEPT     tcp  --  *      *      0.0.0.0/0    0.0.0.0/0            tcp dpt:67</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>As well as our interface information:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>enp0s8: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.200.3  netmask 255.255.255.0  broadcast 192.168.200.255
+        inet6 fe80::a00:27ff:fef6:e2c5  prefixlen 64  scopeid 0x20&lt;link>
+        ether 08:00:27:f6:e2:c5  txqueuelen 1000  (Ethernet)
+        RX packets 532  bytes 46491 (46.4 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 64  bytes 6656 (6.6 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>Let's assume we have the following packet inbound to our machine:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>###[ IP ]### 
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.200.1
+  dst= 192.168.200.3
+  \options\
+###[ TCP ]### 
+     sport= 41437
+     dport= 1111
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= S
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>The packet is destined for our interface on tcp port 1111. Each rule in the INPUT chain is checked to determine
+    whether this packet matches the given rule. In this particular case, the second rule is a match. When a match
+    occurs, the packet jumps to the target and performs the action associated with the matched rule and ignores any
+    rules listed below the one that matched. Here the target is ACCEPT and the packet is allowed through. Simple
+    enough. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>Let's take a look at a different inbound packet:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:code -->
+  <pre class="wp-block-code"><code>###[ IP ]### 
+  version= 4
+  ihl= None
+  tos= 0x0
+  len= None
+  id= 1
+  flags= 
+  frag= 0
+  ttl= 64
+  proto= tcp
+  chksum= None
+  src= 192.168.200.1
+  dst= 192.168.200.3
+  \options\
+###[ TCP ]### 
+     sport= 46189
+     dport= 4444
+     seq= 0
+     ack= 0
+     dataofs= None
+     reserved= 0
+     flags= S
+     window= 8192
+     chksum= None
+     urgptr= 0
+     options= {}</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>This packet is almost identical, except that it is destined for tcp port 4444. If we visually step through the
+    rules in our INPUT chain, we can see that there is no matching rule for this packet. When that is the case, the
+    chain's default policy becomes the target. The default policy can be either ACCEPT or DROP. Here are the steps
+    broken down:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list {"ordered":true} -->
+  <ol>
+    <li>Does rule #1 apply? No</li>
+    <li>Does rule #2 apply? No</li>
+    <li>Does rule #3 apply? No</li>
+    <li>Does rule #4 apply? No</li>
+    <li>What is the chain's default policy? ACCEPT<ol>
+        <li>Jump to ACCEPT</li>
+      </ol>
+    </li>
+  </ol>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>The same concept can be applied to any chain to figure out whether or not traffic will be allowed or not. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>Summary</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>After learning the basic concepts outlined above, we should be able to determine whether or not traffic will be
+    blocked or allowed by iptables. Later on, we'll touch on some more advanced topics surrounding iptables that
+    will build on the skills gained here. </p>
+  <!-- /wp:paragraph -->
+
+  {{ end }}

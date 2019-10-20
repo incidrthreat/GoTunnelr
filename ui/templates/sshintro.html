@@ -1,0 +1,203 @@
+{{ define "page-title" }} ssh Introduction {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center"><code>ssh</code></h2>
+
+  <!-- wp:heading -->
+  <h2>SSH Introduction</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Secure Shell (SSH) is a protocol that allows users to do things like log in to a system remotely, transfer files
+    securely, and execute commands on remote systems. There is a bit of ambiguity surrounding the protocol vs. the
+    command, so let's clear that up before proceeding. SSH-1 is the name of the original, now deprecated, protocol.
+    SSH-2 is the current protocol version. In addition to the protocol, there is the <code>ssh</code> client written
+    by OpenSSH. Most *nix operating systems have an <code>ssh</code> client installed by default. Recently, a
+    similar client has been making its way onto newer versions of the Windows operating system as well. There are
+    other <code>ssh</code> clients; however, we'll primarily focus on the OpenSSH version.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>SSH provides an encrypted connection between a client and a server. To connect to the server, the client needs
+    legitimate server credentials to authenticate. Additionally, the server must be running an SSH daemon (service).
+    The SSH daemon is responsible for listening for and servicing inbound SSH connections. All communication between
+    the client and the server is encrypted. The client encrypts traffic destined for the server while the server
+    decrypts information coming from the client (and vice-versa). The result is an encrypted communication channel
+    that is transparent to the user. The most common use for SSH is to log in to a remote system to utilize a
+    text-based command line interface. Once the remote shell is connected, any commands typed locally are executed
+    on the remote system. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>SSH Protocol</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>As discussed above, SSH-1 is deprecated, insecure, and generally not used. For the remainder of the course, any
+    reference to the SSH protocol is a reference to SSH-2 specifically. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>SSH is considered a protocol in and of itself, but in reality, it is comprised of three separate protocols that
+    are detailed in three Requests for Comments (RFCs). Links to the three protocols and the overarching SSH
+    protocol are listed below</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><a href="https://tools.ietf.org/html/rfc4251" target="_blank" rel="noreferrer noopener"
+        aria-label=" (opens in a new tab)">RFC 4251 - The Secure Shell (SSH) Protocol Architecture</a></li>
+    <li><a rel="noreferrer noopener" aria-label=" (opens in a new tab)" href="https://tools.ietf.org/html/rfc4252"
+        target="_blank">RFC 4252 - The Secure Shell (SSH) Authentication Protocol</a></li>
+    <li><a rel="noreferrer noopener" href="https://tools.ietf.org/html/rfc4253" target="_blank">RFC 4253 - The
+        Secure Shell (SSH) Transport Layer Protocol</a><a rel="noreferrer noopener"
+        href="https://www.ssh.com/a/rfc4252.txt" target="_blank"></a></li>
+    <li><a href="https://tools.ietf.org/html/rfc4254">RFC 4254 - The Secure Shell (SSH) Connection Protocol</a></li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>The Transport Layer Protocol provides server authentication, confidentiality, and integrity. The User
+    Authentication Protocol authenticates the client-side user to the server and runs over the transport layer
+    protocol. The Authentication and Transport Layer protocols are important, but not relevant to what this course
+    aims to teach. The Connection Protocol, however, defines how SSH can do the things that are generally associated
+    with SSH (login shells, tunneling, etc…) and we are definitely interested in those provided capabilities. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>The main takeaway is that the Connection Protocol allows SSH to multiplex its connections. SSH multiplexing
+    occurs over the Transport Protocol's connection that gets established between the client and the server. The
+    Connection Protocol uses the connection provided by the Transport Protocol to allow SSH clients to dynamically
+    generate an arbitrary number of logical SSH channels over a single connection.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>SSH channels come in a few different flavors which are listed below.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li><strong>session</strong> - A session is a remote execution of a program. The program may be a shell, an
+      application, a system command, or some built-in subsystem. Multiple sessions can be active simultaneously.
+    </li>
+    <li><strong>x11</strong> - One of these channel types is opened for each X11 program using X-forwarding.</li>
+    <li><strong>forwarded-tcpip</strong> - Used in conjunction with reverse tunnels (more on this later)</li>
+    <li><strong>direct-tcpip</strong> - Used in conjunction with forward tunnels (more on this later)</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p>SSH is a rich protocol with many different aspects not covered here. Though, we've touched on enough background
+    to facilitate further discussions as they arise. With the protocol basics behind us, let's look at what we can
+    do with SSH.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>SSH Capabilities</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>SSH can perform quite a few beneficial actions for us and provides us some useful features by default. We've
+    touched on some briefly already, but now let's take a moment to discuss them formally.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Authentication</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>SSH can accurately determine whether or not you are allowed to log in to a remote computer. The SSH server
+    demands proof of who you are. The proof can range from a username and password combination, cryptographic keys,
+    or a token from a network authentication protocol like Kerberos. If you prove to the server that you should have
+    access, then you are allowed to log in. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Encryption</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>SSH provides encryption of data by default. Encryption is started before authentication, and no passwords or
+    other information is transmitted in the clear. Generally speaking, anyone able to capture an SSH conversation is
+    not able to make sense of any of the captured data. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Data Integrity</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>SSH guarantees that your data is protected in transit. In addition to its encryption, it has a set of checks and
+    balances in place that attempt to detect and prevent Man-in-the-Middle attacks. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Secure Remote Logins</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>SSH was originally written to replace <code>rlogin</code> and <code>telnet</code> due to their insecure
+    implementations. SSH can be used to get an interactive shell on a remote system or execute a single command.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>X11 Forwarding</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>If X11 is in use, the connection to the X11 display is automatically forwarded to the remote side in such a way
+    that any X11 programs started from the shell traverse the encrypted channel. Simply put, SSH allows us to run
+    GUI-based programs on the server and see their interfaces locally. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Port Forwarding</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Port forwarding, aka tunneling, allows data from insecure applications to be transmitted over secure SSH
+    connections. After port forwarding has been set up, SSH reroutes the connection so that it passes through the
+    SSH connection via a channel. The rerouted traffic is then encrypted end-to-end. Port forwarding is the core
+    concept around which this course is centered. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Secure File Transfer</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Secure File Transfer Protocol (SFTP) is directly related to SSH and began life as an Internet-Draft right
+    alongside the SSH protocols discussed above. SFTP is a separate protocol that rides over SSH to specifically
+    handle file transfers. SFTP is designed to replace FTP due to FTP's insecure implementation. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>SOCKS Proxy </h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The other key focus area for this course is SSH's ability to act as a SOCKS proxy. When acting as a SOCKS proxy,
+    SSH bridges connections from a client to a destination, using the SSH server as an intermediary. We'll explore
+    this concept in more detail later on. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>SSH Based Virtual Private Networks</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>OpenSSH's software can create a Virtual Private Network, allowing two networks to be joined securely via SSH.
+    This particular capability is not built into the protocol, but instead is a feature of OpenSSH's software.
+    Fortunately, OpenSSH's client is typically found on *nix installations.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>Summary</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>We just covered some basic background information about the SSH protocol its capabilities. Next up, we'll explore
+    basic command line syntax and execution of <code>ssh</code>.</p>
+  <!-- /wp:paragraph -->
+  {{ end }}

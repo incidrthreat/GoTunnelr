@@ -1,0 +1,71 @@
+{{ define "page-title" }} ssh Syntax {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center"><code>ssh</code></h2>
+
+  <!-- wp:paragraph -->
+  <p>In this lesson we will cover the following:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li>SSH Server</li>
+    <li>SSH Client</li>
+    <li>Basic SSH Syntax (*nix)</li>
+    <li>Basic SSH Syntax (Windows using PuTTY)</li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:paragraph -->
+  <p><strong>SSH Server</strong> is native to most distributions of *nix and once configured, can be started either at
+    boot or manually.&nbsp; By default, SSH listens on port 22, but can be changed by the system administrator to be
+    something other than port 22.&nbsp; Up until the release of the Anniversary update to Windows 10, and enabling
+    “Developer mode” on that release, SSH was NOT native to the Windows OS environment.&nbsp; Having said that,
+    there are 3<sup>rd</sup> party applications available for previous versions of Windows (Pre-Win10-14352) such as
+    <a href="https://mobassh.mobatek.net/">MobaSSH</a> and <a
+      href="https://winscp.net/eng/docs/guide_windows_openssh_server">OpenSSH</a> to name a couple.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p><strong>SSH Client </strong>also native to *nix and available in Windows 10 post Anniversary update.&nbsp;
+    Previous to that, PuTTY was the most commonly tool used to access an SSH Server from Windows OS.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p><strong>*NIX OS Basic SSH syntax</strong> consists of invoking the ssh client and providing some parameters to
+    traverse the network(s) and attach to the SSH Service.&nbsp; <br><br>With the first two examples, we are using
+    <code>ssh</code> and a target hostname or ip address on a *nix OS to make these connections. With these minimal
+    commands, ssh presumes we want to connect to the ssh server on a remote host as the currently logged in user on
+    our local host (<code>user1</code>) and will make the initial connection then prompt us for the password of the
+    assumed user (<code>user1</code>).<br><br><code>user1@host:~# ssh target</code><br>or
+    <br><code>user1@host:~# ssh 192.168.1.1</code><br><br>Now, if <code>user1</code> is not the user we want to
+    connect as or doesn't exist on the remote server, we need to explicitly tell ssh who we want to be on the
+    remote/target system. With that, the syntax changes slightly with the added username in the syntax. In the
+    example below, we connect to a target machine as <code>user2</code> and you will be prompted for a password
+    related to that specific
+    user.<br><br><code>user1@host:~# ssh user2@target</code><br>or<br><code>user1@host:~# ssh user2@192.168.1.1</code>
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p><strong>Windows OS Basic SSH syntax</strong> uses a 3rd party application called PuTTY and can be found <a
+      href="https://www.putty.org/">here</a>. The Windows examples accomplish the same task of connecting to an
+    ssh service. When we envoke putty.exe we should specify the protocol to use, we do this with the
+    <code>-ssh</code> switch due to the protocol agnostic usecase of PuTTY. Similar to SSH, PuTTY presumes we want
+    to connect as the currently logged in user on our host machine (<code>user1</code>) and will make the initial
+    connection then prompt us for the password of the assumed user (<code>user1</code>).
+    <br><br><code>C:\users\user1\putty.exe -ssh target</code><br>or
+    <br><code>C:\users\user1\putty.exe -ssh <code>192.168.1.1</code></code><br><br>Just as we did in the *Nix Basic
+    Syntax, we can add an additional parameter if a different user is needed. You will be prompted for the password
+    of <code>user2</code> upon sending the below
+    attempt.<br><br><code>C:\users\user1\putty.exe -ssh user2@target</code><br>or<br><code>C:\users\user1\putty.exe -ssh user2@192.168.1.1</code>
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>With these basic SSH commands on both *nix and Windows OS resepectively, you now have an understanding of how to
+    access a remote system using the Basic Secure Shell (SSH) Commands to connect to an SSH Server using an SSH
+    Client. Next, we will be visiting a few specific arguments and parameters that will allow us to do more advanced
+    techniques with SSH.</p>
+  <!-- /wp:paragraph -->
+  {{ end }}

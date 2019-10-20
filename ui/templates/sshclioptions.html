@@ -1,0 +1,409 @@
+{{ define "page-title" }} ssh CLI Options {{ end }}
+{{ define "page-body" }}
+
+<h1 class="display-2 text-center"><code>ssh</code></h2>
+
+  <!-- wp:heading -->
+  <h2>Introduction</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>This section covers the options, arguments, and parameters that are relevant to the course. OpenSSH's
+    <code>ssh</code> offers a plethora of options, but we'll only be covering those that have a direct impact on
+    tunneling, or those that are deemed cool enough by the course creators. If you are already familiar with most of
+    what <code>ssh</code> has to offer, feel free to skim this section and only peruse those which are unknown to
+    you. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2><code>-v</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Verbose mode. Multiple <code>-v</code> options increase verbosity. The maximum is 3. As we work through the
+    course, we are likely to run into unexpected behavior when issuing some <code>ssh</code> commands. When the
+    inevitable occurs, and our <code>ssh</code> command behaves strangely, the first troubleshooting step we should
+    do is to <strong>increase verbosity!</strong> Each successive <code>-v</code> increases the level of debugging
+    output presented to us at the command prompt. The messages provided can very quickly and succinctly point out
+    problems. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -v server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-p port</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Port to connect to on the remote host. This option sees greater use once we're nesting tunnels within tunnels.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -p 2222 server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-L [<u>bind_address</u>:]<u>port</u>:<u>host</u>:<u>hostport</u></code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The <code>-L</code> option is how we build a <strong>forward tunnel</strong>. The <code>-L</code> option
+    specifies that connections to the given TCP port on the local (client) host are to be forwarded to the given
+    host and port on the remote side. Whenever a connection is made to the local port, the connection is forwarded
+    over the existing SSH connection, and a connection is made to the port <u>hostport</u> from the remote machine.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -L 2222:server_two:22 server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>In the example above, we specified the following options:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li>2222<ul>
+        <li>The port on the local end to listen on (client-side)</li>
+      </ul>
+    </li>
+    <li>server_two<ul>
+        <li>Where the traffic is destined after reaching 2222 from the point of view of the creator of the
+          tunnel (traffic will start on the client and be sent through server_one to finally hit server_two)
+        </li>
+      </ul>
+    </li>
+    <li>22<ul>
+        <li>The port to which traffic is destined</li>
+      </ul>
+    </li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:heading -->
+  <h2><code>-R [bind_address:]port:host:hostport</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The <code>-R</code> option is how we build a <strong>reverse tunnel</strong>. The <code>-R</code> option
+    specifies that connections to the given TCP port on the remote (server) host are to be forwarded to the local
+    side. Whenever a connection is made to the port listening on the remote end, the connection is forwarded over
+    the existing SSH connection, and a connection is made to the port <u>hostport</u> from the local machine. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -R 2323:127.0.0.1:1111 server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>In the example above, we specified the following options:</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:list -->
+  <ul>
+    <li>2323<ul>
+        <li>The port on the remote end to listen on; (server_one:2323)</li>
+      </ul>
+    </li>
+    <li>127.0.0.1<ul>
+        <li>Where the traffic flows after reaching 2323 from the point of view of the creator of the tunnel
+          (traffic dumps out locally; the tunnel creator's localhost)</li>
+      </ul>
+    </li>
+    <li>1111<ul>
+        <li>The port to which traffic is destined</li>
+      </ul>
+    </li>
+  </ul>
+  <!-- /wp:list -->
+
+  <!-- wp:heading -->
+  <h2><code>-J <u>destination</u></code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Typically known as <strong>ProxyJump</strong>. The <code>-J</code> allows us to connect to the target host by
+    first making an <code>ssh</code> connection to the jump host described by <u>destination</u> and then
+    establishing a TCP forwarding to the ultimate destination from there. Multiple jump hops may be specified
+    separated by comma characters.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -J user_one@server_one:22022 user_two@server_two</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>In the example above, we're <code>ssh</code>ing to server_one on port 22022 as user_one. Once authenticated via
+    whatever means are in place (password, keys, etc), a connection through server_one will be set up to
+    <code>ssh</code> directly to server_two as user_two. The <code>-J</code> gives us a seamless login experience to
+    arbitrarily nested hosts. If we find our selves using a forward tunnel to forward traffic solely to
+    <code>ssh</code> to another box, <code>-J</code> may be a more elegant solution.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2><code>-g</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The <code>-g</code> allows other computers to connect to tunnels we've set up. Imagine we want to create a tunnel
+    on from client_one to target_one that is accessible to anyone in client_one's subnet. Adding a <code>-g</code>
+    does just that. If client_two wants to utilize the tunnel to target_one, it can. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:paragraph -->
+  <p>An important caveat to note is that the SSH server may prevent a tunnel from listening on all interfaces. The
+    <strong>GatewayPorts</strong> option in <code>/etc/ssh/sshd_config</code> can be set to <code>Yes</code> to
+    allow this behavior. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -L 2222:server_two:22 -g server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-D [bind_address:]port</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Specifies a local Dynamic application-level port forwarding at <u>port</u>, optionally bound to the specified
+    <u>bind_address</u>. In practice, this means that a single port is locally bound, and it acts as a SOCKS proxy.
+    SOCKS4 and SOCKS5 are both supported. Whenever we make a connection to this port, the connection is forwarded
+    over the existing SSH connection, and the application protocol is then used to determine where to connect to
+    from the remote machine.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -D 1080 server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-i <u>identity_file</u></code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Selects a file from which the private key for public key authentication is read. The defaults are
+    <code>~/.ssh/id_dsa</code>, <code>~/.ssh/id_ecdsa</code>, <code>~/.ssh/id_ed25519</code> and
+    <code>~/.ssh/id_rsa</code>.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -i id_rsa.server_one server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-M</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The <code>-M</code> option enables the sharing of multiple sessions over a single network connection. When used,
+    <code>ssh</code> listens for connections on a control socket specified using the <code>-S</code> argument.
+    Additional sessions can connect to this socket using the same <code>-S</code> option and argument. These
+    sessions reuse the master instance's network connection rather than initiating new ones, but fall back to
+    connecting normally if the control socket does not exist, or is not listening.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>Master Mode Connection:
+    ssh -M -S /tmp/sock-%h root@server_one
+
+Second Connection Utilizing Master Mode Socket:
+    ssh -S /tmp/sock-server_one server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-S <u>ctl_path</u></code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Specify the path to the control socket used for connection sharing as described in the <code>-M</code> section
+    above. An <code>ssh</code> command using <code>-S</code> attempts to reuse the master mode socket referenced to
+    create a channelized connection through the existing master connection. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>Master Mode Connection:
+    ssh -M -S /tmp/sock-%h root@server_one
+
+Second Connection Utilizing Master Mode Socket:
+    ssh -S /tmp/sock-server_one server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:heading -->
+  <h2><code>-N</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>If a connection is only used to create a tunnel, we can instruct it to not execute any remote programs by using
+    <code>-N.</code> The result is a non-interactive session. <code>-N</code> is usually used with <code>-f</code>
+    to prevent remote program execution along with putting the connection into the background. <br></p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -L 2222:server_two:22 -Nf server_one</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>In the example above, we have a tunnel to server_two via server_one ready to go, but as soon as the connection is
+    established, we get our command prompt back. This is because the tunnel is established then the connection is
+    run in the background. This has the benefit of not tying up a window with an interactive window when only a
+    tunnel is needed. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2><code>-f</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>Requests the <code>ssh</code> client to go to background just before command execution. This implies
+    <code>-n</code>. The <code>-f</code> option is often used when setting up tunnels where we don't care about
+    interacting with the target that the tunnel runs through. If we want a tunnel without an interactive shell,
+    <code>-f</code> is one of the options we'll use.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -f server_one "sleep 15"</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>If you try the example above, a simple <code>ps -ef | grep sleep</code> will show that the sleep executed without
+    tying up your current terminal.</p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2><code>-X</code></h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Description</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>The X Window System (also known as X11, or just X) is software as well as a network protocol that lets us
+    interact locally with the GUI of an application running on a remote machine. The <code>-X</code> option enables
+    X11 forwarding. Forwarding X connections over SSH allows us to run GUI applications on the remote server but see
+    the application displayed locally, with the unencrypted X communication secured by the existing SSH connection.
+  </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading {"level":3} -->
+  <h3>Example</h3>
+  <!-- /wp:heading -->
+
+  <!-- wp:code -->
+  <pre class="lead bg-info text-light pl-3"><code>ssh -X server_one xeyes</code></pre>
+  <!-- /wp:code -->
+
+  <!-- wp:paragraph -->
+  <p>Running the above command, we should see a pair of googly eyes that follow our mouse's cursor. </p>
+  <!-- /wp:paragraph -->
+
+  <!-- wp:heading -->
+  <h2>Summary</h2>
+  <!-- /wp:heading -->
+
+  <!-- wp:paragraph -->
+  <p>We've covered all of the options that are pertinent to the course or are just plain neat to know. Using the
+    options above, we'll be able to perform a wide array of tasks solely using SSH, so we've got that going for us,
+    which is nice. </p>
+  <!-- /wp:paragraph -->
+  {{ end }}
